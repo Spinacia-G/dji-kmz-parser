@@ -10,7 +10,8 @@
     "moduleResolution": "Node",
     "lib": [
       "ESNext",
-      "DOM"
+      "DOM",
+      "DOM.Iterable"
     ]
   },
   "include": [

@@ -1,28 +1,17 @@
-# SDK-Template
+# Dji-kmz-parser
 
 ## Usage
 
-> This project requires Node >=16 [ES compatibility table](https://compat-table.github.io/compat-table/es2016plus/)
+```typescript
+<script setup lang="ts">
+import kmzFile from '/files/flight.kmz?url'
+import { kmzToJson, xmlToJson } from '../lib'
 
-#### Install
-
-```bash
-pnpm install
-# If you don't have pnpm installed, run: npm install pnpm -g
-```
-
-#### Development
-
-```bash
-pnpm dev
-```
-
-#### Build
-
-```bash
-# build playground
-pnpm build:prod
-
-# build library (from /packages to /lib)
-pnpm build:lib
+fetch(kmzFile)
+  .then(async (res: Response) => {
+    const obj = await kmzToJson(res)
+    console.log(obj)
+  })
+  .catch(err => console.log(err))
+</script>
 ```

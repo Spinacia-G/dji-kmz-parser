@@ -1,15 +1,23 @@
 <script setup lang="ts">
-import { testSum, ExampleComp } from '../lib'
-import { ref } from 'vue'
+import kmzFile from '/files/flight.kmz?url'
+import kmlFile from '/files/template.kml?url'
+import { kmzToJson, xmlToJson } from '../lib'
 
-const sum = ref<number>(0)
-sum.value = testSum(1, 2)
+fetch(kmzFile)
+  .then(async (res: Response) => {
+    const obj = await kmzToJson(res)
+    console.log(obj, 'kmz')
+  })
+  .catch(err => console.log(err))
+
+fetch(kmlFile).then(async (res: Response) => {
+  const obj = await xmlToJson(res)
+  console.log(obj, 'kml')
+})
 </script>
 
 <template>
-  <div>
-    <example-comp :prop-name="sum" />
-  </div>
+  <div> 111 </div>
 </template>
 
 <style scoped lang="scss"></style>

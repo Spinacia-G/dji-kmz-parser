@@ -3,7 +3,6 @@ import vue from '@vitejs/plugin-vue'
 import path from 'path'
 import { resolve } from 'path'
 import eslintPlugin from 'vite-plugin-eslint'
-import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
 
 const pathSrc = path.resolve(__dirname, 'playground')
 export default defineConfig({
@@ -13,10 +12,6 @@ export default defineConfig({
       include: ['playground'],
       cache: false,
       fix: true
-    }),
-    createSvgIconsPlugin({
-      iconDirs: [path.resolve(process.cwd(), 'playground/assets/icons')],
-      symbolId: 'icon-[dir]-[name]'
     })
   ],
   resolve: {

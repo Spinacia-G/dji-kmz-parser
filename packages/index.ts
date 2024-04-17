@@ -1,10 +1,3 @@
-import ExampleComp from './example'
-import { App } from 'vue'
+import { kmzToJson, xmlToJson } from './parser'
 
-export * from './example'
-
-export default {
-  install: (app: App) => {
-    app.use(ExampleComp)
-  }
-}
+export { kmzToJson, xmlToJson }
