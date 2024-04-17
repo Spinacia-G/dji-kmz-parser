@@ -1,7 +1,9 @@
 .vscode
 .idea
+.husky
 
 node_modules
+public
 packages
 playground
 src

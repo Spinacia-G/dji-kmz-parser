@@ -1,7 +1,0 @@
-auto-imports.d.ts
-components.d.ts
-
-/node_modules/*
-/dist/*
-/public/*
-/release/*

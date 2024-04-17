@@ -2,7 +2,6 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import path from 'path'
 import { resolve } from 'path'
-import eslintPlugin from 'vite-plugin-eslint'
 import dts from 'vite-plugin-dts'
 
 const pathSrc = path.resolve(__dirname, 'packages')
@@ -10,11 +9,6 @@ export default defineConfig({
   publicDir: false,
   plugins: [
     vue(),
-    eslintPlugin({
-      include: ['packages'],
-      cache: false,
-      fix: true
-    }),
     dts({
       rollupTypes: true,
       tsconfigPath: 'tsconfig.lib.json'
