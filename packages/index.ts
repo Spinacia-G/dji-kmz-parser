@@ -1,3 +1,3 @@
-import { kmzToJson, xmlToJson } from './parser'
+import { kmzToJson, xmlToJson, jsonToKmz, jsonToXml } from './parser'
 
-export { kmzToJson, xmlToJson }
+export { kmzToJson, xmlToJson, jsonToKmz, jsonToXml }
