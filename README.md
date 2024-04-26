@@ -19,8 +19,7 @@
    	.catch((err: string) => console.log(err))
    </script>
    ```
-
-
+ 
 
 2. `jsonToKmz`
 

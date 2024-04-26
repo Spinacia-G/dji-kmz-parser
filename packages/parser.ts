@@ -1,103 +1,15 @@
 import JSZip from 'jszip'
-
-export interface ActionType {
-  (propName: string): string
-}
-
-export interface PointType {
-  Point: {
-    coordinates: string
-  }
-  actionGroup: {
-    action: Array<ActionType>
-    actionGroupEndIndex: string
-    actionGroupId: string
-    actionGroupMode: string
-    actionGroupStartIndex: string
-    actionTrigger: {
-      actionTriggerType: string
-    }
-  }
-  ellipsoidHeight: string
-  height: string
-  index: string
-  isRisky: string
-  useGlobalHeadingParam: string
-  useGlobalHeight: string
-  useGlobalSpeed: string
-  useStraightLine: string
-  waypointHeadingParam: {
-    waypointHeadingAngle: string
-    waypointHeadingMode: string
-    waypointHeadingPathMode: string
-    waypointHeadingPoiIndex: string
-    waypointPoiPoint: string
-  }
-  waypointSpeed: string
-  waypointTurnParam: {
-    waypointTurnDampingDist: string
-    waypointTurnMode: string
-  }
-}
-
-export interface KmlType {
-  author: string
-  createTime: string
-  updateTime: string
-  Folder: {
-    Placemark?: Array<PointType>
-    autoFlightSpeed: string
-    caliFlightEnable: string
-    gimbalPitchMode: string
-    globalHeight: string
-    globalUseStraightLine: string
-    globalWaypointHeadingParam: {
-      waypointHeadingAngle: string
-      waypointHeadingMode: string
-      waypointHeadingPathMode: string
-      waypointHeadingPoiIndex: string
-      waypointPoiPoint: string
-    }
-    globalWaypointTurnMode: string
-    payloadParam: {
-      focusMode: string
-      imageFormat: string
-      meteringMode: string
-      payloadPositionIndex: string
-      returnMode: string
-      samplingRate: string
-      scanningMode: string
-    }
-    templateId: string
-    templateType: string
-    waylineCoordinateSysParam: {
-      coordinateMode: string
-      heightMode: string
-    }
-  },
-  missionConfig: {
-    droneInfo: {
-      droneEnumValue: string
-      droneSubEnumValue: string
-    }
-    executeRCLostAction: string
-    exitOnRCLost: string
-    finishAction: string
-    flyToWaylineMode: string
-    globalRTHHeight: string
-    globalTransitionalSpeed: string
-    payloadInfo: {
-      payloadEnumValue: string
-      payloadPositionIndex: string
-      payloadSubEnumValue: string
-    }
-    takeOffRefPoint: string
-    takeOffRefPointAGLHeight: string
-    takeoffSecurityHeight: string
-  }
-}
+import { TemplateFile } from './typing/template.ts'
+import { WaylineFile } from './typing/wayline.ts'
 
 const staticName: string[] = ['Folder', 'Placemark', 'Point', 'coordinates']
+/**
+ * 格式化时需要处理成数组的节点
+ * - `PlaceMark` 航点信息
+ * - `actionGroup` 航点动作按照 `actionTriggerType` 分组
+ * - `action` 每个分组下的动作列表
+ */
+const arrayLikeName: string[] = ['Placemark', 'actionGroup', 'action']
 
 /**
  * convert Element in XML DOM to key-value pairs in JSON
@@ -111,11 +23,11 @@ const parseNode = (xml: Document | Element, obj: Record<string, any>) => {
   } else if (xml.childNodes[0].nodeType === Node.TEXT_NODE) {
     obj[attr] = xml.childNodes[0].nodeValue
   } else {
-    if (obj[attr]) {
-      if (!Array.isArray(obj[attr])) {
-        obj[attr] = [obj[attr], {}]
+    if (arrayLikeName.includes(attr)) {
+      if (obj[attr]?.length) {
+        obj[attr].push({})
       } else {
-        obj[attr] = [...obj[attr], {}]
+        obj[attr] = [{}]
       }
     } else {
       obj[attr] = {}
@@ -141,12 +53,12 @@ export const xmlToJson = async (xmlLike: Response | string) => {
   } else {
     str = xmlLike
   }
-
+  
   str = str
     .replaceAll('\n', '')
     .replaceAll('\t', '')
     .replaceAll(/((?<=>)\x20)|(\x20(?=<))|((?<=\x20)\x20)|(\x20(?=\x20))/g, '')
-
+  
   const parser = new DOMParser()
   const xmlDoc = parser.parseFromString(str, 'text/xml')
   const obj: Record<string, any> = {}
@@ -168,7 +80,7 @@ export const kmzToJson = async (blobLike: Response | Blob) => {
   } else {
     return Promise.reject('zip is missing')
   }
-
+  
   if (blob) {
     const kmzObj: Record<string, any> = {}
     let res: JSZip
@@ -258,7 +170,7 @@ const generateNode = (root: Element, obj: Record<string, any>) => {
  * @param {KmlType | Record<string, any>} obj
  * @returns {Document}
  */
-export const jsonToXml = (obj: KmlType | Record<string, any>) => {
+export const jsonToXml = (obj: TemplateFile | WaylineFile) => {
   const rootStr = '<?xml version="1.0" encoding="UTF-8"?><kml xmlns="http://www.opengis.net/kml/2.2" xmlns:wpml="http://www.dji.com/wpmz/1.0.6"></kml>'
   const root = new DOMParser().parseFromString(rootStr, 'text/xml')
   root.childNodes[0].appendChild(root.createElement('Document'))
@@ -268,13 +180,13 @@ export const jsonToXml = (obj: KmlType | Record<string, any>) => {
 
 /**
  * create KMZ file from JSON
- * @description Reference: [how to create KMZ file](https://sdk-forum.dji.net/hc/en-us/articles/12254235478681-How-to-creat-KMZ-file)
+ * @description [how to create KMZ file](https://sdk-forum.dji.net/hc/en-us/articles/12254235478681-How-to-creat-KMZ-file)
  * @param {{template: KmlType, waylines: Record<string, any>}} obj
  * @returns {Promise<Awaited<Blob>>} KMZ file in Blob format
  */
 export const jsonToKmz = async (obj: {
-  template: KmlType
-  waylines: Record<string, any>
+  template: TemplateFile
+  waylines: WaylineFile
 }) => {
   try {
     const kmlDoc = jsonToXml(obj.template)
