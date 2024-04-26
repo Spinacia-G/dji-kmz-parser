@@ -298,10 +298,7 @@ export declare interface Hover extends ActionBaseType {
  * @param {{template: KmlType, waylines: Record<string, any>}} obj
  * @returns {Promise<Awaited<Blob>>} KMZ file in Blob format
  */
-export declare const jsonToKmz: (obj: {
-    template: TemplateFile;
-    waylines: WaylineFile;
-}) => Promise<Blob>;
+export declare const jsonToKmz: (obj: KmzFile) => Promise<Blob | string>;
 
 /**
  * create XML DOM from JSON
@@ -310,12 +307,23 @@ export declare const jsonToKmz: (obj: {
  */
 export declare const jsonToXml: (obj: TemplateFile | WaylineFile) => Document;
 
+export declare interface KmzFile {
+    /**
+     * 航线模板文件
+     */
+    template: TemplateFile;
+    /**
+     * 航线执行文件
+     */
+    waylines: WaylineFile;
+}
+
 /**
  * convert KMZ file to JSON (JavaScript Object Notation)
  * @param {Response | Blob} blobLike
  * @returns {Promise<Awaited<Record<string, any>>>}
  */
-export declare const kmzToJson: (blobLike: Response | Blob) => Promise<Record<string, any>>;
+export declare const kmzToJson: (blobLike: Response | Blob) => Promise<KmzFile | string>;
 
 /**
  * 动作 - 精准复拍/定向拍照

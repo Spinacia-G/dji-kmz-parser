@@ -1,6 +1,7 @@
 import JSZip from 'jszip'
 import { TemplateFile } from './typing/template.ts'
 import { WaylineFile } from './typing/wayline.ts'
+import { KmzFile } from './typing'
 
 const staticName: string[] = ['Folder', 'Placemark', 'Point', 'coordinates']
 /**
@@ -16,7 +17,7 @@ const arrayLikeName: string[] = ['Placemark', 'actionGroup', 'action']
  * @param {Document | Element} xml
  * @param {Record<string, any>} obj
  */
-const parseNode = (xml: Document | Element, obj: Record<string, any>) => {
+const parseNode = (xml: Document | Element, obj: Record<string, any>): void => {
   const attr = xml.nodeName.replace('wpml:', '')
   if (!xml.childNodes.length) {
     obj[attr] = undefined
@@ -71,7 +72,7 @@ export const xmlToJson = async (xmlLike: Response | string) => {
  * @param {Response | Blob} blobLike
  * @returns {Promise<Awaited<Record<string, any>>>}
  */
-export const kmzToJson = async (blobLike: Response | Blob) => {
+export const kmzToJson = async (blobLike: Response | Blob): Promise<KmzFile | string> => {
   let blob: Blob
   if (blobLike instanceof Response) {
     blob = await blobLike.blob()
@@ -142,7 +143,7 @@ const isObject = (target: unknown): target is Record<any, any> => {
  * @param {Element} root
  * @param {Record<string, any>} obj
  */
-const generateNode = (root: Element, obj: Record<string, any>) => {
+const generateNode = (root: Element, obj: Record<string, any>): void => {
   const doc = new Document()
   for (let key in obj) {
     const xmlKey = staticName.includes(key) ? key : `wpml:${key}`
@@ -170,7 +171,7 @@ const generateNode = (root: Element, obj: Record<string, any>) => {
  * @param {KmlType | Record<string, any>} obj
  * @returns {Document}
  */
-export const jsonToXml = (obj: TemplateFile | WaylineFile) => {
+export const jsonToXml = (obj: TemplateFile | WaylineFile): Document => {
   const rootStr = '<?xml version="1.0" encoding="UTF-8"?><kml xmlns="http://www.opengis.net/kml/2.2" xmlns:wpml="http://www.dji.com/wpmz/1.0.6"></kml>'
   const root = new DOMParser().parseFromString(rootStr, 'text/xml')
   root.childNodes[0].appendChild(root.createElement('Document'))
@@ -184,19 +185,16 @@ export const jsonToXml = (obj: TemplateFile | WaylineFile) => {
  * @param {{template: KmlType, waylines: Record<string, any>}} obj
  * @returns {Promise<Awaited<Blob>>} KMZ file in Blob format
  */
-export const jsonToKmz = async (obj: {
-  template: TemplateFile
-  waylines: WaylineFile
-}) => {
+export const jsonToKmz = async (obj: KmzFile): Promise<Blob | string> => {
   try {
-    const kmlDoc = jsonToXml(obj.template)
-    const wpmlDoc = jsonToXml(obj.waylines)
+    const templateDoc = jsonToXml(obj.template)
+    const waylinesDoc = jsonToXml(obj.waylines)
     const serializer = new XMLSerializer()
-    const kmlStr = serializer.serializeToString(kmlDoc)
-    const wpmlStr = serializer.serializeToString(wpmlDoc)
+    const templateStr = serializer.serializeToString(templateDoc)
+    const waylinesStr = serializer.serializeToString(waylinesDoc)
     const zip = new JSZip()
-    zip.folder('wpmz')!.file('template.kml', kmlStr)
-    zip.folder('wpmz')!.file('waylines.wpml', wpmlStr)
+    zip.folder('wpmz')!.file('template.kml', templateStr)
+    zip.folder('wpmz')!.file('waylines.wpml', waylinesStr)
     const res: Blob = await zip.generateAsync({ type: 'blob' })
     return Promise.resolve(res)
   } catch {

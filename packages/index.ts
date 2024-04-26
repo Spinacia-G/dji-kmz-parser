@@ -40,3 +40,7 @@ export type {
   GlobalWaypointTurnMode,
   GimbalPitchMode
 } from './typing/template.ts'
+
+export type {
+  KmzFile
+} from './typing/index'

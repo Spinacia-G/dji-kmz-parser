@@ -11,9 +11,9 @@ fetch(kmzFile)
   })
   .catch((err: string) => console.log(err))
 
-jsonToKmz(testObj as any).then((res: Blob) => {
+jsonToKmz(testObj as any).then((res: Blob | string) => {
   const a = document.createElement('a')
-  a.href = window.URL.createObjectURL(res)
+  a.href = window.URL.createObjectURL(res as Blob)
   a.download = `flight-${new Date().getTime()}.kmz`
   // a.click()
 }).catch((err: string) => console.log(err))
