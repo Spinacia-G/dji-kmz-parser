@@ -2,6 +2,10 @@
 
 ## Usage
 
+```bash
+pnpm add dji-kmz-parser
+```
+
 1. `kmzToJson`
 
    Convert KMZ file (with Blob format) to JSON.
@@ -9,7 +13,7 @@
    ```typescript
    <script setup lang="ts">
    import kmzFile from '/files/flight.kmz?url'
-   import { kmzToJson } from '../lib'
+   import { kmzToJson } from 'dji-kmz-parser/lib'
    
    fetch(kmzFile)
    	.then(async (res: Response) => {
@@ -19,7 +23,7 @@
    	.catch((err: string) => console.log(err))
    </script>
    ```
- 
+
 
 2. `jsonToKmz`
 
@@ -28,7 +32,7 @@
    ```typescript
    <script setup lang="ts">
    import flightObj from '/files/flightObj.ts'
-   import { jsonToKmz } from '../lib'
+   import { jsonToKmz } from 'dji-kmz-parser/lib'
    
    jsonToKmz(flightObj).then((res: Blob) => {
        const a = document.createElement('a')

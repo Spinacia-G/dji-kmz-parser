@@ -1,12 +1,12 @@
 {
   "name": "dji-kmz-parser",
-  "version": "1.2.0",
+  "version": "1.2.2",
   "type": "module",
   "author": "Spinacia",
   "description": "convert kmz to json",
   "license": "MIT",
-  "main": "./index.umd.cjs",
-  "module": "./index.js",
+  "main": "./lib/index.umd.cjs",
+  "module": "./lib/index.js",
   "keywords": [
     "kmz",
     "dji",
